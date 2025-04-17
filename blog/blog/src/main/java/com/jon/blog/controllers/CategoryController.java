@@ -38,6 +38,6 @@ public class CategoryController {
         return new ResponseEntity<>(
                 categoryMapper.toDto(savedCategory),
                 HttpStatus.CREATED
-        );git 
+        );
     }
 }
