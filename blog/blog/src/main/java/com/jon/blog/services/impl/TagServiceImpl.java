@@ -3,14 +3,12 @@ package com.jon.blog.services.impl;
 import com.jon.blog.domain.entities.Tag;
 import com.jon.blog.repositories.TagRepository;
 import com.jon.blog.services.TagService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,5 +45,24 @@ public class TagServiceImpl implements TagService {
 
         savedTags.addAll(existingTags);
         return savedTags;
+    }
+
+    @Transactional
+    @Override
+    public void deleteTag(UUID id) {
+        tagRepository.findById(id).ifPresent(tag -> {
+            if (tag.getPosts().size() > 0){
+                throw new IllegalStateException("Cannot delete tag with posts");
+            }
+
+            tagRepository.deleteById(id);
+
+        });
+    }
+
+    @Override
+    public Tag findTagById(UUID id) {
+        return  tagRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tag not found with id " + id));
     }
 }
